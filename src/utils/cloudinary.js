@@ -27,7 +27,32 @@ const uploadOnCloudinary = async (localFilePath) =>{
     }
 }
 
-export {uploadOnCloudinary}
+const extractPublicIdFromURL =(imageURL) =>{
+    if(!imageURL) return null;
+    const publicIdMatch = imageURL.match(/\/v\d+\/([^/]+)\.\w+$/);
+    return publicIdMatch ? publicIdMatch[1] : null;
+}
+
+const deleteFromCloudinary = async(imageURL)=>{
+    if(!imageURL) return false;
+
+    try {
+        const publicId = extractPublicIdFromURL(imageURL);
+        if(!publicId){
+            throw new ApiError(400,"Could not extract publicId of Image");
+        }
+        const result = await cloudinary.uploader.destroy(publicId);
+        return res
+        .status(200)
+        .json(
+        new ApiResponse(200,user,"Avatar deleted Successfully")
+    )
+    } catch (error) {
+        throw new ApiError(500,'Error deleting image from Cloudinary')
+    }
+}
+
+export {uploadOnCloudinary,deleteFromCloudinary}
 
 
 
